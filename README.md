@@ -31,18 +31,21 @@ Create by Jingeun_Cho
 
 <h4 align="center">2. Dashboard<h4>
 <p align="center">로그인 후 오늘 매장 예약 현황 및 최근에 방문한 회원님 목록 표시</p>
+<br/>
   
 ![rainbow_edit_member](https://user-images.githubusercontent.com/91510708/178640272-6ba516b1-c78a-48c9-8570-3d21029447f2.jpeg)
 
 <h4 align="center">3. 회원 목록 <h4>
 <p align="cenrer"> 선택 된 지점 또는 전체 회원 목록 및 정보 관리</p>
-  
+<br/>  
+
 ![rainbowConsole_member](https://user-images.githubusercontent.com/91510708/178640293-cbeda90d-d54e-439e-af63-a80fba84a469.jpeg)
 
 ![rainbow_edit_member](https://user-images.githubusercontent.com/91510708/178640272-6ba516b1-c78a-48c9-8570-3d21029447f2.jpeg)
 
 <h4 align="center">4. 매니저 목록 <h4>
 <p align="cenrer"> 선택 된 지점 또는 전체 매니저 목록 및 정보 관리</p>
+<br/>
   
 ![rainbowConsole_manager](https://user-images.githubusercontent.com/91510708/178640291-2ce5652d-d043-4f2e-aa9b-2dd938e6b950.jpeg)
   
