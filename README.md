@@ -9,6 +9,17 @@ Create by Jingeun_Cho
   <img src="https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logoColor=white&logo=kotlin">
   <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logoColor=white&logo=firebase">
 </p>
+  
+<h4 align="center"> Description <h4>
+<p align="center"> MVC패턴을 이용하여 기존 스파게티 코드를 해소하고, View에서 직접 Firebase 코드 호출을 최소화</p>
+
+<h4 align="center"> Problem <h4>
+<p align="center"> 1. Firestore의 AddSnapshotListener를 추가 할 때 Controller에서 선언해야하는가 View에서 해야 하는가? </p> 
+<p align="center"> Contoller의 return type을 Collection Reference 타입으로 반환 시 AddSnapshotListener 등록 가능 </p>
+ 
+<p align="center"> 2. MVVM 패턴을 적용 할 수 있는가? </p> 
+<p align="center"> MVVM 패턴을 적용하기 위하여 학습 중  </p>
+
 
 <h3 align="center"> App Screen <h4>
 <h4 align="center">1. Login <h4>
