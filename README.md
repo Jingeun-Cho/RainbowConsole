@@ -46,4 +46,4 @@ Create by Jingeun_Cho
   
 ![rainbowConsole_manager](https://user-images.githubusercontent.com/91510708/178640291-2ce5652d-d043-4f2e-aa9b-2dd938e6b950.jpeg)
   
-![rainbow_edit_member](https://user-images.githubusercontent.com/91510708/178640272-6ba516b1-c78a-48c9-8570-3d21029447f2.jpeg)
+![rainbowConsole_edit_manager](https://user-images.githubusercontent.com/91510708/178640282-d979a774-65d0-4545-979d-96ffde6b784e.jpeg)
