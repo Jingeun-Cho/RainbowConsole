@@ -39,7 +39,7 @@ Create by Jingeun_Cho
 
 <br/>
 <h4 align="center">3. 회원 목록 <h4>
-<p align="cenrer"> 선택 된 지점 또는 전체 회원 목록 및 정보 관리</p>
+<p align="center">선택 된 지점 또는 전체 회원 목록 및 정보 관리</p>
 <br/>  
 
 ![rainbowConsole_member](https://user-images.githubusercontent.com/91510708/178640293-cbeda90d-d54e-439e-af63-a80fba84a469.jpeg)
@@ -48,7 +48,7 @@ Create by Jingeun_Cho
 
 <br/>
 <h4 align="center">4. 매니저 목록 <h4>
-<p align="cenrer"> 선택 된 지점 또는 전체 매니저 목록 및 정보 관리</p>
+<p align="center">선택 된 지점 또는 전체 매니저 목록 및 정보 관리</p>
 <br/>
   
 ![rainbowConsole_manager](https://user-images.githubusercontent.com/91510708/178640291-2ce5652d-d043-4f2e-aa9b-2dd938e6b950.jpeg)
