@@ -11,6 +11,8 @@ Create by Jingeun_Cho
 </p>
   
 <h4 align="center"> Description <h4>
+<p align="center"> 매장의 예약 관리(추가 및 취소)와 회원 및 매니저들을 관리하는 태블릿 용 어플리케이션 </p>
+<p align="center"> Landscape를 기준으로 하여 제작 </p>
 <p align="center"> MVC패턴을 이용하여 기존 스파게티 코드를 해소하고, View에서 직접 Firebase 코드 호출을 최소화</p>
 
 <h4 align="center"> Problem <h4>
@@ -18,7 +20,7 @@ Create by Jingeun_Cho
 <p align="center"> Contoller의 return type을 Collection Reference 타입으로 반환 시 AddSnapshotListener 등록 가능 </p>
  
 <p align="center"> 2. MVVM 패턴을 적용 할 수 있는가? </p> 
-<p align="center"> MVVM 패턴을 적용하기 위하여 학습 중  </p>
+<p align="center"> MVVM 패턴을 적용하기 위하여 학습 중 </p>
 
 
 <h3 align="center"> App Screen <h4>
