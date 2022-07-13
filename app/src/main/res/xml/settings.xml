@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="회원 잔여 레슨권 알림"/>
+        <EditTextPreference
+            android:key="notification_remain_day"
+            android:title="잔여 기간 알림 날짜(일)"
+            android:defaultValue="30"
+            android:dialogMessage="알림을 받을 회원님의 잔여 기간을 선택 해주세요"
+            />
+        <EditTextPreference
+            android:key="notification_remain_membership"
+            android:title="잔여 레슨권 알림 (회)"
+            android:defaultValue="10"
+            android:dialogMessage="알림을 받을 회원님의 잔여 레슨권을 선택 해주세요"
+            />
+
+    <PreferenceCategory
+        android:title="사이드바 "/>
+    <ListPreference
+        android:key="side_bar_show_type"
+        android:title="사이드바 표시 내용"
+        android:entries="@array/setting_side_bar"
+        android:entryValues="@array/setting_side_bar_value"
+        android:defaultValue="0"
+        android:summary="메인 화면 우측에 화면 선택"
+        />
+
+</PreferenceScreen>

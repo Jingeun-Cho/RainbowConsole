@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.rainbow.rainbowconsole.activity.MainActivity"
+    android:weightSum="5"
+    android:backgroundTint="@color/background_gray"
+    >
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="25dp"
+        android:background="@drawable/design_round_right"
+        android:elevation="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="5dp"
+
+        >
+        <ImageView
+            android:id="@+id/img_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/rainbow_logo"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            />
+
+        <!-- 메뉴 리스트 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/img_logo"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_dashboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:background="@color/white"
+                android:drawableStart="@drawable/ic_dashboard"
+                android:gravity="center"
+                android:outlineProvider="none"
+                android:padding="5dp"
+                android:text="@string/text_menu_dashboard"
+                android:textColor="@color/primary_text_color" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_member"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:background="@color/white"
+                android:drawableStart="@drawable/ic_member"
+                android:gravity="center"
+                android:outlineProvider="none"
+                android:padding="5dp"
+                android:text="@string/text_menu_member"
+                android:textColor="@color/primary_text_color" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_pro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:background="@color/white"
+                android:drawableStart="@drawable/ic_pro"
+                android:gravity="center"
+                android:outlineProvider="none"
+                android:padding="5dp"
+                android:text="@string/text_menu_pro"
+                android:textColor="@color/primary_text_color" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_calc_lesson"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:background="@color/white"
+                android:drawableStart="@drawable/ic_calc_lesson"
+                android:gravity="center"
+                android:outlineProvider="none"
+                android:padding="5dp"
+                android:text="@string/text_menu_calc"
+                android:textColor="@color/primary_text_color" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:background="@color/white"
+                android:drawableStart="@drawable/ic_setting"
+                android:gravity="center"
+                android:outlineProvider="none"
+                android:padding="5dp"
+                android:text="@string/text_menu_banner"
+                android:textColor="@color/primary_text_color" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_reserve"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:background="@color/white"
+                android:drawableStart="@drawable/ic_setting"
+                android:gravity="center"
+                android:outlineProvider="none"
+                android:padding="5dp"
+                android:text="@string/text_menu_reserve"
+                android:textColor="@color/primary_text_color" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:background="@color/white"
+                android:drawableStart="@drawable/ic_setting"
+                android:gravity="center"
+                android:outlineProvider="none"
+                android:padding="5dp"
+                android:text="@string/text_menu_setting"
+                android:textColor="@color/primary_text_color" />
+        </LinearLayout>
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/text_menu_logout"
+            app:drawableLeftCompat="@drawable/ic_logout"
+            android:background="@color/white"
+            android:textColor="@color/primary_text_color"
+            android:outlineProvider="none"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="4"
+        android:orientation="vertical"
+        android:weightSum="8"
+
+        >
+
+        <RelativeLayout
+            android:id="@+id/layout_top"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/design_rounded_rectangle"
+            android:backgroundTint="@color/background_gray"
+            android:elevation="10dp"
+
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            >
+
+            <TextView
+                android:id="@+id/text_branch"
+                android:layout_width="175dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true"
+                android:autoSizeMaxTextSize="25sp"
+                android:autoSizeTextType="uniform"
+                android:gravity="center_vertical"
+                android:text="여의도 1호점"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/input_search_member"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="50dp"
+                android:layout_toEndOf="@id/text_branch"
+                android:drawableStart="@drawable/ic_search"
+                android:drawablePadding="10dp"
+                android:hint="@string/text_hint_search_member" />
+
+            <Button
+                android:id="@+id/btn_search"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toEndOf="@id/input_search_member"
+                android:background="@drawable/design_btn_search"
+                android:text="@string/text_btn_search" />
+
+            <TextView
+                android:id="@+id/text_branch_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/btn_search"
+                android:text="@string/text_branch_status"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <Spinner
+                android:id="@+id/spinner_branch_status"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:layout_below="@id/text_branch_status"
+                android:layout_toEndOf="@id/btn_search" />
+
+            <ImageButton
+                android:id="@+id/btn_01"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/btn_02"
+
+                android:elevation="5dp"
+                android:src="@drawable/ic_notification" />
+
+            <ImageButton
+                android:id="@+id/btn_02"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:elevation="5dp"
+                android:src="@drawable/ic_gallery" />
+        </RelativeLayout>
+
+
+        <FrameLayout
+            android:id="@+id/view_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@id/layout_top"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toStartOf="@id/layout_recent_member"
+            android:background="@drawable/design_rounded_rectangle"
+            android:backgroundTint="@color/background_gray"
+            android:elevation="10dp"
+            android:padding="5dp" />
+
+        <RelativeLayout
+            android:id="@+id/layout_recent_member"
+            android:layout_width="350dp"
+            android:layout_height="match_parent"
+            android:layout_below="@id/layout_top"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/design_rounded_rectangle"
+            android:elevation="10dp"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:id="@+id/text_recent_member"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="최근 이용 회원님"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_recent_member"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_below="@id/text_recent_member"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true" />
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+
+
+</LinearLayout>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:padding="15dp"
+    android:orientation="vertical"
+    >
+   <ImageView
+       android:id="@+id/img_profile"
+       android:layout_width="125dp"
+       android:layout_height="125dp"
+       android:src="@drawable/default_profile"
+      />
+   <TextView
+       android:id="@+id/text_pro_name"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+      android:text="조진근 프로님"
+       android:textSize="22sp"
+       android:textColor="@color/black"
+      />
+
+   <LinearLayout
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal">
+      <include
+          android:id="@+id/view_work_start"
+         layout="@layout/layout_time" />
+      <include
+          android:id="@+id/view_work_end"
+          layout="@layout/layout_time" />
+
+
+   </LinearLayout>
+
+   <Button
+       android:id="@+id/btn_info"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:backgroundTint="@color/work_blue"
+      android:text="근무중"
+      />
+
+</LinearLayout>

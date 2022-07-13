@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="start"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:orientation="vertical"
+    >
+   <ImageView
+       android:id="@+id/img_profile"
+       android:layout_width="100dp"
+       android:layout_height="100dp"
+       android:src="@drawable/default_profile" />
+   <TextView
+       android:id="@+id/text_member_name"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:textSize="22sp"
+       android:textColor="@color/black"
+      />
+  <include
+     android:id="@+id/layout_remain_period"
+     layout="@layout/layout_horizontal_text"
+      />
+   <include
+       android:id="@+id/layout_remain_coupon"
+       layout="@layout/layout_horizontal_text"
+       />
+   <TextView
+      android:id="@+id/text_member_phone"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:drawablePadding="5dp"
+       app:drawableStartCompat="@drawable/ic_phone" />
+   <TextView
+       android:id="@+id/text_membership"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+      />
+   <include
+       android:id="@+id/layout_pro"
+       layout="@layout/layout_horizontal_text"
+       />
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+      android:orientation="horizontal"
+       >
+      <Button
+          android:id="@+id/btn_info"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:backgroundTint="@color/work_blue"
+          android:text="@string/test_btn_member_info"
+          android:layout_weight="1"
+          android:layout_margin="5dp"
+          />
+      <Button
+          android:id="@+id/btn_lesson_history"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:backgroundTint="@color/more_mauve"
+          android:layout_weight="1"
+          android:text="@string/text_btn_lesson_history"
+          android:textColor="@color/hard_purple"
+          android:layout_margin="5dp"
+          />
+   </LinearLayout>
+
+
+</LinearLayout>

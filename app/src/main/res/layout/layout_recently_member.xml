@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp">
+
+    <ImageView
+        android:id="@+id/img_recent"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/default_profile"
+        android:layout_marginEnd="10dp"/>
+
+    <TextView
+        android:id="@+id/text_member_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/img_recent"
+        android:layout_toEndOf="@id/img_recent"
+        android:text="조진근 회원님"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
+    <TextView
+        android:id="@+id/text_lesson_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/img_recent"
+        android:layout_toEndOf="@id/img_recent"
+        android:text="12:00 레슨 진행"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        />
+    <TextView
+        android:id="@+id/text_pro_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/img_recent"
+        android:layout_alignParentEnd="true"
+        android:text="조진근 프로님"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
+</RelativeLayout>
