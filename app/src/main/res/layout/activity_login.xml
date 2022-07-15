@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:weightSum="2"
     android:orientation="horizontal"
-    tools:context="com.rainbow.rainbowconsole.activity.LoginActivity">
+    tools:context=".view.activity.LoginActivity">
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"

@@ -6,12 +6,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.rainbow.rainbowconsole.controller.*
-import com.rainbow.rainbowconsole.fragment.*
-import com.rainbow.rainbowconsole.repository.BannerRepositoryImpl
-import com.rainbow.rainbowconsole.repository.MemberRepositoryImpl
-import com.rainbow.rainbowconsole.repository.ProRepositoryImpl
-import com.rainbow.rainbowconsole.repository.LessonRepositoryImpl
+import com.rainbow.rainbowconsole.model.controller.*
+import com.rainbow.rainbowconsole.model.repository.*
+import com.rainbow.rainbowconsole.view.fragment.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -22,6 +19,8 @@ object AppConfig {
     val memberController : MemberController = MemberControllerImpl(MemberRepositoryImpl(firestore))
     val lessonController : LessonController = LessonControllerImpl(LessonRepositoryImpl(firestore))
     val bannerController : BannerController = BannerControllerImpl(BannerRepositoryImpl(firestore))
+    val branchController : BranchController = BranchControllerImpl(BranchRepositoryImpl(firestore))
+
     val proFragment  by lazy { ProFragment() }
     val dashboardFragment by lazy{ DashboardFragment() }
     val memberFragment by lazy{ MemberFragment() }

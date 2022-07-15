@@ -18,11 +18,11 @@
         >
 
         <activity
-            android:name="com.rainbow.rainbowconsole.activity.MainActivity"
+            android:name="com.rainbow.rainbowconsole.view.activity.MainActivity"
             android:screenOrientation="userLandscape"
             android:exported="true"/>
         <activity
-            android:name="com.rainbow.rainbowconsole.activity.LoginActivity"
+            android:name="com.rainbow.rainbowconsole.view.activity.LoginActivity"
             android:screenOrientation="userLandscape"
             android:exported="true">
             <intent-filter>
@@ -30,7 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".fragment.SettingDialogFragment"
+        <activity android:name="com.rainbow.rainbowconsole.view.fragment.SettingDialogFragment"
             android:screenOrientation="userLandscape"
             android:exported="false"
             />

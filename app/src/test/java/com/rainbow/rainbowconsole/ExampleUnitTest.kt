@@ -1,8 +1,8 @@
 package com.rainbow.rainbowconsole
 
 import com.rainbow.rainbowconsole.config.AppConfig
-import com.rainbow.rainbowconsole.repository.MemberRepositoryImpl
-import com.rainbow.rainbowconsole.repository.MemberRepository
+import com.rainbow.rainbowconsole.model.repository.MemberRepositoryImpl
+import com.rainbow.rainbowconsole.model.repository.MemberRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
