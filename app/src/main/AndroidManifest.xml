@@ -30,10 +30,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.rainbow.rainbowconsole.view.fragment.SettingDialogFragment"
-            android:screenOrientation="userLandscape"
-            android:exported="false"
-            />
     </application>
 
 </manifest>

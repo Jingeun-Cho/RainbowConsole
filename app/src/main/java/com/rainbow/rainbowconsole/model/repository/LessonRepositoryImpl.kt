@@ -58,24 +58,15 @@ class LessonRepositoryImpl(private val firestore : FirebaseFirestore) : LessonRe
 
 
 
-    override fun findByUidWithPeriod( startTime: Long, endTime: Long, uid: ArrayList<String> ): Deferred< ArrayList<LessonDTO>> =
-        CoroutineScope(Dispatchers.IO).async {
-            try {
+    override fun findByUidWithPeriod( startTime: Long, endTime: Long, uid: ArrayList<String> ): Query =
                 firestore
                     .collection("lesson")
                     .whereIn("coachUid", uid)
                     .whereGreaterThanOrEqualTo("lessonDateTime", startTime)
                     .whereLessThanOrEqualTo("lessonDateTime", endTime)
                     .orderBy("lessonDateTime", Query.Direction.DESCENDING)
-                    .get()
-                    .await()
-                    .toObjects(LessonDTO::class.java) as ArrayList
-            }
-            catch (e : FirebaseException){
-                Log.e("LessonRepositoryImpl", "findByUid: ${e.message}" )
-                arrayListOf()
-            }
-        }
+
+
 
     override fun findByRecent(): Deferred<ArrayList<LessonDTO>> =
         CoroutineScope(Dispatchers.IO).async {

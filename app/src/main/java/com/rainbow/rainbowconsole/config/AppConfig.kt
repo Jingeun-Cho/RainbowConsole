@@ -21,6 +21,13 @@ object AppConfig {
     val bannerController : BannerController = BannerControllerImpl(BannerRepositoryImpl(firestore))
     val branchController : BranchController = BranchControllerImpl(BranchRepositoryImpl(firestore))
 
+    var loginRepository : LoginRepository = LoginRepositoryImpl(auth)
+    val proRepository = ProRepositoryImpl(firestore)
+    val memberRepository = MemberRepositoryImpl(firestore)
+    val lessonRepository = LessonRepositoryImpl(firestore)
+    val bannerRepository = BannerRepositoryImpl(firestore)
+    val branchRepository = BranchRepositoryImpl(firestore)
+
     val proFragment  by lazy { ProFragment() }
     val dashboardFragment by lazy{ DashboardFragment() }
     val memberFragment by lazy{ MemberFragment() }

@@ -11,7 +11,10 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.firestore.Query
 import com.rainbow.rainbowconsole.R
@@ -22,6 +25,7 @@ import com.rainbow.rainbowconsole.model.controller.ProController
 import com.rainbow.rainbowconsole.databinding.FragmentDashboardBinding
 import com.rainbow.rainbowconsole.model.data_class.LessonDTO
 import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
+import com.rainbow.rainbowconsole.view_model.fragment.DashboardViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,102 +34,86 @@ import java.time.ZoneOffset
 
 class DashboardFragment : Fragment(){
     private var binding : FragmentDashboardBinding? = null
+    private lateinit var dashboardViewModel : DashboardViewModel
     private val proController : ProController = AppConfig.proController
-    private val lessonController : LessonController = AppConfig.lessonController
-    private val TAG = "DashboardFragment"
-    private val firestore = AppConfig.firestore
+
+    companion object{
+        const val TAG = "DashboardFragment"
+        const val TIME_OFFSET = 24 * 60 * 60 * 1000 - 1
+    }
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-        binding = FragmentDashboardBinding.inflate(inflater, container, false)
-        return binding!!.root
+        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_dashboard, container, false)
+        dashboardViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application).create(DashboardViewModel::class.java)
+
+        binding?.apply {
+            lifecycleOwner = requireActivity()
+            dashboardViewModel = dashboardViewModel
+        }
+
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val branch = arguments?.getString("branch", "전체")!!
-        initView(branch)
+        val startTime= getToday()
+        dashboardViewModel.getProItems(branch)
+        dashboardViewModel.observeProItems().observe(requireActivity()){ proItems ->
+            val proUids: ArrayList<String> = arrayListOf()
+
+            proItems.withIndex().forEach { (index, proData) ->
+                addTableHead(index, proData)
+                proUids.add(proData.uid!!)
+            }
+            addSnapshotListener(startTime, startTime + TIME_OFFSET, proUids)
+            initView(proItems, startTime)
+        }
+    }
+
+    private fun addSnapshotListener(startTime : Long, endTime : Long, proUids : ArrayList<String>){
+        dashboardViewModel.getLessonItems(startTime, endTime, proUids)
     }
 
     @SuppressLint("SetTextI18n")
-    private fun initView(branch : String){
-        CoroutineScope(Dispatchers.IO).launch {
-            val proItems = if(branch == "전체") proController.getAllPro().await() else proController.searchProByBranch(branch).await()
-            val proUids : ArrayList<String> = arrayListOf()
-            val (startTime, endTime) = getToday()
-            proItems.forEach { proUids.add(it.uid!!) }
-            requireActivity().runOnUiThread {
-                proItems.withIndex().forEach { (index, proData) ->
-                addTableHead(index, proData)
-            } }
+    private fun initView(proItems : ArrayList<ManagerDTO>, startTime : Long){
+        binding!!.recyclerTd.layoutManager = LinearLayoutManager(requireContext(),  LinearLayoutManager.VERTICAL,  false )
 
-            firestore
-                .collection("lesson")
-                .whereIn("coachUid", proUids)
-                .whereGreaterThanOrEqualTo("lessonDateTime", startTime)
-                .whereLessThanOrEqualTo("lessonDateTime", endTime)
-                .orderBy("lessonDateTime", Query.Direction.DESCENDING)
-                .addSnapshotListener { querySnapshot, error ->
-                    if(error != null || querySnapshot == null){
-                        Log.e(TAG, "initView: ${error?.message}", )
-                        return@addSnapshotListener
-                    }
+        dashboardViewModel.observeLessonItem().observe(requireActivity()){(todayLessonItems, documentIds) ->
+            var completeLesson = 0
+            val totalLesson = todayLessonItems.size
+            todayLessonItems.forEach { if(it.lessonNote.isNullOrEmpty()) completeLesson++ }
 
-                    val todayLessonItems : ArrayList<LessonDTO> = arrayListOf()
-                    val documentIds : ArrayList<String> = arrayListOf()
-                    todayLessonItems.clear()
-                    documentIds.clear()
-                    val totalLesson = todayLessonItems.size
-                    var completeLesson = 0
-                    querySnapshot.forEach {
-                        val item = it.toObject(LessonDTO::class.java)
-                        todayLessonItems.add(item)
-                        documentIds.add(it.id)
-                        if(item.lessonNote!!.isNotEmpty()) completeLesson ++;
-                    }
-                    Log.d("initView", "initView: ${todayLessonItems}")
-                    requireActivity().runOnUiThread {
-                        binding!!.textTotalLesson.text = "레슨 예정 : ${totalLesson}회"
-                        binding!!.textCompleteLesson.text = "레슨 완료 : ${completeLesson}회"
-                        binding!!.recyclerTd.apply {
-                            layoutManager = LinearLayoutManager(requireContext(),  LinearLayoutManager.VERTICAL,  false )
-                            adapter = TodayScheduleRecyclerViewAdapter( proItems, todayLessonItems, documentIds ,startTime )
-                        }
-                    }
-//            val todayLessonItems = lessonController.searchByUidWithPeriod(startTime, endTime, proUids).await()
-//            Log.d(TAG, "initView: items.size : ${todayLessonItems.size} / ${todayLessonItems}")
-
-            }
+            binding!!.textTotalLesson.text = "레슨 예정 : ${totalLesson}회"
+            binding!!.textCompleteLesson.text = "레슨 완료 : ${completeLesson}회"
+            binding!!.recyclerTd.adapter = TodayScheduleRecyclerViewAdapter( proItems, todayLessonItems, documentIds ,startTime )
         }
     }
+
     private fun addTableHead(index : Int, proData : ManagerDTO){
         val textView = TextView(requireContext())
-
         val layoutParams = LinearLayout.LayoutParams( 250, LinearLayout.LayoutParams.MATCH_PARENT)
+
         layoutParams.marginStart = 10
         layoutParams.marginEnd = 10
-
         textView.text = proData.name
         textView.textSize = 18f
         textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         textView.gravity = Gravity.CENTER
-
         textView.setTypeface(null, Typeface.NORMAL)
         textView.id = index
 
         binding!!.layoutTh.addView(textView, layoutParams)
     }
 
-    private fun drawRecyclerView(){
-
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
     }
-    private fun getToday() : Pair<Long, Long>{
+    private fun getToday() : Long{
         val offset = ZoneOffset.systemDefault()
         val today = LocalDate.now().atStartOfDay().atZone(offset).toInstant().toEpochMilli()
-        val timeOffset = 24 * 60 * 60 * 1000 - 1
-        return Pair(today, today + timeOffset)
+
+        return today
     }
 }

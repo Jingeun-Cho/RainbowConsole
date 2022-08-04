@@ -26,13 +26,12 @@ class MemberFragment : Fragment() {
 
     private var binding : FragmentMemberBinding? = null
     private lateinit var memberViewModel : MemberViewModel
-    private val memberController : MemberController = AppConfig.memberController
 
     private val offset = ZoneOffset.systemDefault()
     private val today = LocalDate.now().atStartOfDay(offset).toInstant().toEpochMilli()
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_member,container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_member, container, false)
         memberViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application).create(MemberViewModel::class.java)
         binding?.apply {
             lifecycleOwner = requireActivity()
@@ -43,25 +42,28 @@ class MemberFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val branch = arguments?.getString("branch")
-        initView(branch!!)
+        val branch = arguments?.getString("branch", "")!!
+        initViewModel(branch)
+        initView()
     }
 
-    private fun initView(branch : String){
-        initRecyclerView(branch, today)
+    private fun initViewModel(branch : String){
+        memberViewModel.getUserItems(branch)
+    }
+    private fun initView(){
+        initRecyclerView(today)
     }
 
     @SuppressLint("SetTextI18n")
-    private fun initRecyclerView(branch : String, today : Long){
+    private fun initRecyclerView( today : Long){
         binding!!.recyclerMemberList.layoutManager = GridLayoutManager(requireContext(), 3)
-        memberViewModel.getUserItems(branch).observe(requireActivity()){ memberItems ->
+        memberViewModel.observeMemberData().observe(requireActivity()){ memberItems ->
             val totalMembers = memberItems.size
             var remainMembers : Int = 0
-            memberItems.forEach { if((it.lessonMembership - it.lessonMembershipUsed) > 10  || (it.lessonMembershipEnd - today)/ (24 * 60 * 60 * 1000) > 30 ) remainMembers++ }
+            memberItems.forEach { if((it.lessonMembership - it.lessonMembershipUsed) > 10 || (it.lessonMembershipEnd - today)/ (24 * 60 * 60 * 1000) > 30 ) remainMembers++ }
             binding?.recyclerMemberList?.adapter = MemberRecyclerViewAdapter(memberItems)
             binding?.textTotalMember?.text = "총 회원 : ${totalMembers}명"
             binding?.textDeadline?.text = "마감 예정 회원 : ${remainMembers}명"
-
         }
     }
 }

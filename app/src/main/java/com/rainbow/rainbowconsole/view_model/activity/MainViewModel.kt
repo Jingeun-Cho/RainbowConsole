@@ -20,31 +20,27 @@ class MainViewModel : ViewModel(){
 
     private var updateResultData : Boolean = false
 
-    fun getTodayLesson(today : Long) : MutableLiveData<ArrayList<LessonDTO>>{
+    fun observeLessonData() : MutableLiveData<ArrayList<LessonDTO>>{
+        return lessonData
+    }
+    fun observeBranchStatusData() : MutableLiveData<BranchStatusDTO>{
+        return branchStatusData
+    }
+
+    fun getTodayLesson(today : Long){
         lessonController.searchByPeriod(today, today + 24 * 60 * 60 * 1000 -1)
             .addSnapshotListener { querySnapshot, error ->
                 if(error != null || querySnapshot == null) return@addSnapshotListener
                 lessonData.value = querySnapshot.toObjects(LessonDTO::class.java) as ArrayList
             }
-
-        return lessonData
     }
 
-    //All Branch
-    fun getAllBranchStatus(){
-
-    }
-
-
-    fun getBranchStatus(branch : String) : MutableLiveData<BranchStatusDTO>{
+    fun getBranchStatus(branch : String){
         branchController.getBranchStatus(branch)
             .addSnapshotListener { querySnapshot, error ->
                 if (querySnapshot == null || error != null) return@addSnapshotListener
                 branchStatusData.value = querySnapshot.toObject(BranchStatusDTO::class.java)
-
             }
-
-        return branchStatusData
     }
 
     fun updateBranchStatus(branch: String, status : String) : Boolean {

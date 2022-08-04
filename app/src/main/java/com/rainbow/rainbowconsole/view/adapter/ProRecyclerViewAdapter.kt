@@ -74,7 +74,6 @@ class ProRecyclerViewAdapter(private val proItems : ArrayList<ManagerDTO>) : Rec
                 else
                     binding.btnInfo.text = "휴무"
             }
-
         }
 
         //진짜 시간 적용 필요

@@ -13,7 +13,7 @@ interface LessonRepository {
 
     fun findByPeriod(startTime : Long, endTime : Long) : Query
 
-    fun findByUidWithPeriod(startTime : Long, endTime : Long, uid : ArrayList<String>) : Deferred<ArrayList<LessonDTO>>
+    fun findByUidWithPeriod(startTime : Long, endTime : Long, uid : ArrayList<String>) :Query
     fun findByRecent() : Deferred<ArrayList<LessonDTO>>
     fun findByRecentByBranch(branch : String) : Deferred<ArrayList<LessonDTO>>
     fun deleteLesson(documentId : String): Task<Transaction>

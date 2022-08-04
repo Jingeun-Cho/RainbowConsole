@@ -40,17 +40,19 @@ class EditBannerDialogFragment : DialogFragment(){
         var bannerItem : BannerDTO?
         if(dialogType == 1){
             val documentId = arguments?.getString("documentId", "")!!
-            CoroutineScope(Dispatchers.Main).launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 bannerItem = bannerController.getBanner(documentId).await()
 
-                binding?.inputDescription?.setText(bannerItem?.description)
-                binding?.inputDialogTitle?.setText(bannerItem?.dialogTitle)
-                binding?.inputImageUrl?.setText(bannerItem?.imageUrl)
-                binding?.inputRedirectUrl?.setText(bannerItem?.redirectUrl)
+                requireActivity().runOnUiThread {
+                    binding?.inputDescription?.setText(bannerItem?.description)
+                    binding?.inputDialogTitle?.setText(bannerItem?.dialogTitle)
+                    binding?.inputImageUrl?.setText(bannerItem?.imageUrl)
+                    binding?.inputRedirectUrl?.setText(bannerItem?.redirectUrl)
 
 
-                binding?.btnConfirm?.setOnClickListener {
-                    editBanner(bannerItem!!, documentId)
+                    binding?.btnConfirm?.setOnClickListener {
+                        editBanner(bannerItem!!, documentId)
+                    }
                 }
             }
         }
@@ -60,8 +62,10 @@ class EditBannerDialogFragment : DialogFragment(){
             binding?.inputImageUrl?.setText("")
             binding?.inputRedirectUrl?.setText("")
             binding?.btnConfirm?.setOnClickListener {
-                bannerItem = BannerDTO()
-                addBanner(bannerItem!!)
+                CoroutineScope(Dispatchers.IO).launch {
+                    bannerItem = BannerDTO()
+                    addBanner(bannerItem!!)
+                }
             }
         }
 

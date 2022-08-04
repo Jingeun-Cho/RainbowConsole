@@ -1,6 +1,7 @@
 package com.rainbow.rainbowconsole.model.repository
 
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Transaction
 import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
 import com.rainbow.rainbowconsole.model.data_class.ManagerScheduleDTO
@@ -14,9 +15,11 @@ interface ProRepository {
 
     fun findByName(name : String) : Deferred<ManagerDTO?>
 
-    fun findByBranch(branch : String) : Deferred<ArrayList<ManagerDTO>>
+    fun findByEmail(email : String) : Query
 
-    fun findAllByBranch() : Deferred<ArrayList<ManagerDTO>>
+    fun findByBranch(branch : String) : Query
+
+    fun findAllByBranch() : Query?
 
     fun findProScheduleByUid(uid : String) : Deferred<ManagerScheduleDTO>
 

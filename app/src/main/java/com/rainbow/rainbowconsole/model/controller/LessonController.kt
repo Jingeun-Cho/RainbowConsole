@@ -14,7 +14,7 @@ interface LessonController {
 
     fun searchByPeriod(startTime : Long, endTime : Long) : Query
 
-    fun searchByUidWithPeriod(startTime: Long, endTime: Long, uid: ArrayList<String>) : Deferred<ArrayList<LessonDTO>>
+    fun searchByUidWithPeriod(startTime: Long, endTime: Long, uid: ArrayList<String>) : Query
 
     fun searchRecent() : Deferred<ArrayList<LessonDTO>>
 

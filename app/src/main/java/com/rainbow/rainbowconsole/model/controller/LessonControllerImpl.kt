@@ -14,7 +14,8 @@ class LessonControllerImpl(private val lessonRepository : LessonRepository) : Le
 
     override fun searchByPeriod(startTime: Long, endTime: Long): Query = lessonRepository.findByPeriod(startTime, endTime)
 
-    override fun searchByUidWithPeriod( startTime: Long, endTime: Long, uid: ArrayList<String> ): Deferred<ArrayList<LessonDTO>> = lessonRepository.findByUidWithPeriod(startTime, endTime, uid)
+    override fun searchByUidWithPeriod( startTime: Long, endTime: Long, uid: ArrayList<String> ): Query
+    = lessonRepository.findByUidWithPeriod(startTime, endTime, uid)
 
     override fun searchRecent(): Deferred<ArrayList<LessonDTO>> = lessonRepository.findByRecent()
     override fun searchRecent(branch : String): Deferred<ArrayList<LessonDTO>> = lessonRepository.findByRecentByBranch(branch)

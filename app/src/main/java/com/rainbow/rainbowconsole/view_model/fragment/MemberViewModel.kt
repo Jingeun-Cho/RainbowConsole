@@ -10,7 +10,7 @@ class MemberViewModel : ViewModel(){
     private val memberItemData : MutableLiveData<ArrayList<UserDTO>> by lazy {
             MutableLiveData()
         }
-    fun getUserItems(branch : String) : MutableLiveData<ArrayList<UserDTO>>{
+    fun getUserItems(branch : String){
         if(branch == "전체"){
             memberController.searchAll()
                 .addSnapshotListener { querySnapshot, error ->
@@ -26,8 +26,8 @@ class MemberViewModel : ViewModel(){
                     if(error != null || querySnapshot == null) return@addSnapshotListener
                     memberItemData.value = querySnapshot.toObjects(UserDTO::class.java) as ArrayList
                 }
-
         }
-        return memberItemData
     }
+    fun observeMemberData() : MutableLiveData<ArrayList<UserDTO>> = memberItemData
+
 }

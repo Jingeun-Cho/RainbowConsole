@@ -1,6 +1,7 @@
 package com.rainbow.rainbowconsole.model.controller
 
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Transaction
 import com.rainbow.rainbowconsole.model.repository.ProRepository
 import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
@@ -13,9 +14,9 @@ class ProControllerImpl(private val proRepository : ProRepository) : ProControll
 
     override fun searchProByName(name: String): Deferred<ManagerDTO?> = proRepository.findByName(name)
 
-    override fun searchProByBranch(branch: String): Deferred<ArrayList<ManagerDTO>> = proRepository.findByBranch(branch)
+    override fun searchProByBranch(branch: String): Query? = proRepository.findByBranch(branch)
 
-    override fun getAllPro(): Deferred<ArrayList<ManagerDTO>> = proRepository.findAllByBranch()
+    override fun getAllPro(): Query? = proRepository.findAllByBranch()
 
     override fun getProSchedule(uid : String): Deferred<ManagerScheduleDTO> = proRepository.findProScheduleByUid(uid)
     override fun updatePro(pro: ManagerDTO, proSchedule : ManagerScheduleDTO): Task<Transaction>? = proRepository.updatePro(pro, proSchedule)
