@@ -15,11 +15,10 @@ import java.util.*
 object AppConfig {
     val firestore: FirebaseFirestore by lazy { Firebase.firestore }
     val auth : FirebaseAuth by lazy { Firebase.auth }
+
     val proController : ProController = ProControllerImpl(ProRepositoryImpl(firestore))
     val memberController : MemberController = MemberControllerImpl(MemberRepositoryImpl(firestore))
     val lessonController : LessonController = LessonControllerImpl(LessonRepositoryImpl(firestore))
-    val bannerController : BannerController = BannerControllerImpl(BannerRepositoryImpl(firestore))
-    val branchController : BranchController = BranchControllerImpl(BranchRepositoryImpl(firestore))
 
     var loginRepository : LoginRepository = LoginRepositoryImpl(auth)
     val proRepository = ProRepositoryImpl(firestore)

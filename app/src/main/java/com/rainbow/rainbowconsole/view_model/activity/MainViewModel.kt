@@ -8,8 +8,8 @@ import com.rainbow.rainbowconsole.model.data_class.BranchStatusDTO
 import com.rainbow.rainbowconsole.model.data_class.LessonDTO
 
 class MainViewModel : ViewModel(){
-    private val lessonController = AppConfig.lessonController
-    private val branchController = AppConfig.branchController
+    private val lessonRepository = AppConfig.lessonRepository
+    private val branchRepository = AppConfig.branchRepository
     private val lessonData : MutableLiveData<ArrayList<LessonDTO>> by lazy {
         MutableLiveData<ArrayList<LessonDTO>>(arrayListOf())
     }
@@ -28,7 +28,7 @@ class MainViewModel : ViewModel(){
     }
 
     fun getTodayLesson(today : Long){
-        lessonController.searchByPeriod(today, today + 24 * 60 * 60 * 1000 -1)
+        lessonRepository.findByPeriod(today, today + 24 * 60 * 60 * 1000 -1)
             .addSnapshotListener { querySnapshot, error ->
                 if(error != null || querySnapshot == null) return@addSnapshotListener
                 lessonData.value = querySnapshot.toObjects(LessonDTO::class.java) as ArrayList
@@ -36,7 +36,7 @@ class MainViewModel : ViewModel(){
     }
 
     fun getBranchStatus(branch : String){
-        branchController.getBranchStatus(branch)
+        branchRepository.getStatus(branch)
             .addSnapshotListener { querySnapshot, error ->
                 if (querySnapshot == null || error != null) return@addSnapshotListener
                 branchStatusData.value = querySnapshot.toObject(BranchStatusDTO::class.java)
@@ -45,7 +45,7 @@ class MainViewModel : ViewModel(){
 
     fun updateBranchStatus(branch: String, status : String) : Boolean {
         Log.d("updateBranchStatus", "updateBranchStatus: 진입")
-        branchController.changeBranchStatus(branch, status)
+        branchRepository.updateStatus(branch, status)
             .addOnSuccessListener {
                 updateResultData = true
             }
@@ -59,7 +59,7 @@ class MainViewModel : ViewModel(){
 
 
     fun updateBranchStatus(branch: Array<String>, status : String) : Boolean {
-        branchController.changeBranchStatus(branch, status)
+        branchRepository.updateStatus(branch, status)
             .addOnSuccessListener {
                 updateResultData = true
             }

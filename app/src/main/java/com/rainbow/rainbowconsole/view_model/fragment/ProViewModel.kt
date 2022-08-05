@@ -1,6 +1,5 @@
 package com.rainbow.rainbowconsole.view_model.fragment
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.rainbow.rainbowconsole.config.AppConfig

@@ -2,6 +2,7 @@ package com.rainbow.rainbowconsole.model.controller
 
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Transaction
 
 import com.rainbow.rainbowconsole.model.data_class.BannerDTO
@@ -11,7 +12,7 @@ import kotlinx.coroutines.Deferred
 class BannerControllerImpl(private val bannerRepository: BannerRepository) : BannerController{
     override fun getBannerList(): CollectionReference? = bannerRepository.getBannerList()
 
-    override fun getBanner(documentId: String): Deferred<BannerDTO?> = bannerRepository.getBanner(documentId)
+    override fun getBanner(documentId: String): DocumentReference = bannerRepository.getBanner(documentId)
 
     override fun addNewBanner(banner: BannerDTO, documentId: String): Task<Void> = bannerRepository.addBanner(banner, documentId)
 

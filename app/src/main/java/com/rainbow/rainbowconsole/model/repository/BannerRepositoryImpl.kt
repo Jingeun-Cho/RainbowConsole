@@ -13,32 +13,16 @@ import kotlinx.coroutines.tasks.await
 class BannerRepositoryImpl(private val firestore : FirebaseFirestore) : BannerRepository {
 
 
-    override fun getBannerList() : CollectionReference? {
-        return try {
-            firestore
-                .collection("banner")
-        }
-        catch (e : FirebaseFirestoreException){
-            Log.e("getBanner", "getBanner: ${e.message} ", )
-            null
-        }
-    }
+    override fun getBannerList() : CollectionReference =
+        firestore
+            .collection("banner")
 
-    override fun getBanner(documentId: String): Deferred<BannerDTO?> {
-        return   CoroutineScope(Dispatchers.IO).async {
-            try{
-                firestore
-                    .collection("banner")
-                    .document(documentId)
-                    .get()
-                    .await().toObject(BannerDTO::class.java)
-            }
-            catch (e : FirebaseFirestoreException){
-                Log.e("getBanner", "getBanner: ${e.message} ", )
-                null
-            }
-        }
-    }
+
+    override fun getBanner(documentId: String): DocumentReference =
+        firestore
+            .collection("banner")
+            .document(documentId)
+
 
     override fun addBanner(banner : BannerDTO, documentId: String) : Task<Void>{
         return firestore

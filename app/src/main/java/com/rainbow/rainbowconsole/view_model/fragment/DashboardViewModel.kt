@@ -12,9 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DashboardViewModel : ViewModel(){
-    private val lessonController = AppConfig.lessonController
-    private val proController = AppConfig.proController
-
     private val lessonRepository = AppConfig.lessonRepository
     private val proRepository = AppConfig.proRepository
 
@@ -46,7 +43,7 @@ class DashboardViewModel : ViewModel(){
 
     }
     fun getLessonItems(start : Long, end : Long, proItems : ArrayList<String>){
-        lessonController.searchByUidWithPeriod(start, end, proItems)
+        lessonRepository.findByUidWithPeriod(start, end, proItems)
             .addSnapshotListener { querySnapshot, error ->
                 if(querySnapshot == null || error != null) return@addSnapshotListener
                 val todayLessonItems : ArrayList<LessonDTO> = arrayListOf()

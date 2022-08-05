@@ -32,9 +32,9 @@ class MemberFragment : Fragment() {
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_member, container, false)
-        memberViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application).create(MemberViewModel::class.java)
+        memberViewModel = ViewModelProvider(this).get(MemberViewModel::class.java)
         binding?.apply {
-            lifecycleOwner = requireActivity()
+            lifecycleOwner = viewLifecycleOwner
             memberViewModel = memberViewModel
         }
         return binding?.root
@@ -57,7 +57,7 @@ class MemberFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun initRecyclerView( today : Long){
         binding!!.recyclerMemberList.layoutManager = GridLayoutManager(requireContext(), 3)
-        memberViewModel.observeMemberData().observe(requireActivity()){ memberItems ->
+        memberViewModel.observeMemberData().observe(viewLifecycleOwner){ memberItems ->
             val totalMembers = memberItems.size
             var remainMembers : Int = 0
             memberItems.forEach { if((it.lessonMembership - it.lessonMembershipUsed) > 10 || (it.lessonMembershipEnd - today)/ (24 * 60 * 60 * 1000) > 30 ) remainMembers++ }

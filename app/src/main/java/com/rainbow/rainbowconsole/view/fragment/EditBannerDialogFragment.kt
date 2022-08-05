@@ -1,24 +1,34 @@
 package com.rainbow.rainbowconsole.view.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.snackbar.Snackbar
+import com.rainbow.rainbowconsole.R
 import com.rainbow.rainbowconsole.config.AppConfig
 import com.rainbow.rainbowconsole.databinding.FragmentEditBannerDialogBinding
 import com.rainbow.rainbowconsole.model.data_class.BannerDTO
+import com.rainbow.rainbowconsole.view_model.fragment.EditBannerViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class EditBannerDialogFragment : DialogFragment(){
     private var binding : FragmentEditBannerDialogBinding? = null
-    private val bannerController = AppConfig.bannerController
-
+    private lateinit var editBannerViewModel: EditBannerViewModel
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-        binding = FragmentEditBannerDialogBinding.inflate(inflater, container, false)
+        editBannerViewModel = ViewModelProvider(this).get(EditBannerViewModel::class.java)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_banner_dialog, container, false)
+        binding?.lifecycleOwner = viewLifecycleOwner
+        binding?.editBannerViewModel = editBannerViewModel
         return binding?.root
     }
 
@@ -36,36 +46,48 @@ class EditBannerDialogFragment : DialogFragment(){
                 else -> {""}
             }
         }
-
-        var bannerItem : BannerDTO?
+        Log.d("dialog", "onViewCreated: ${dialogType} ")
         if(dialogType == 1){
             val documentId = arguments?.getString("documentId", "")!!
-            CoroutineScope(Dispatchers.IO).launch {
-                bannerItem = bannerController.getBanner(documentId).await()
 
-                requireActivity().runOnUiThread {
+            editBannerViewModel.getBanner(documentId)
+            editBannerViewModel.observeBannerItem().observe(viewLifecycleOwner, object : Observer<BannerDTO>{
+                override fun onChanged(bannerItem: BannerDTO?) {
                     binding?.inputDescription?.setText(bannerItem?.description)
                     binding?.inputDialogTitle?.setText(bannerItem?.dialogTitle)
                     binding?.inputImageUrl?.setText(bannerItem?.imageUrl)
                     binding?.inputRedirectUrl?.setText(bannerItem?.redirectUrl)
 
-
                     binding?.btnConfirm?.setOnClickListener {
                         editBanner(bannerItem!!, documentId)
                     }
+                    editBannerViewModel.observeBannerItem().removeObserver(this)
+
                 }
-            }
+            })
+
+
+//            CoroutineScope(Dispatchers.IO).launch {
+//
+//                bannerItem = bannerController.getBanner(documentId).await()
+//
+//                requireActivity().runOnUiThread {
+//                    binding?.inputDescription?.setText(bannerItem?.description)
+//                    binding?.inputDialogTitle?.setText(bannerItem?.dialogTitle)
+//                    binding?.inputImageUrl?.setText(bannerItem?.imageUrl)
+//                    binding?.inputRedirectUrl?.setText(bannerItem?.redirectUrl)
+//
+//
+//                    binding?.btnConfirm?.setOnClickListener {
+//                        editBanner(bannerItem!!, documentId)
+//                    }
+//                }
+//            }
         }
         else{
-            binding?.inputDescription?.setText("")
-            binding?.inputDialogTitle?.setText("")
-            binding?.inputImageUrl?.setText("")
-            binding?.inputRedirectUrl?.setText("")
             binding?.btnConfirm?.setOnClickListener {
-                CoroutineScope(Dispatchers.IO).launch {
-                    bannerItem = BannerDTO()
-                    addBanner(bannerItem!!)
-                }
+                val bannerItem = BannerDTO()
+                addBanner(bannerItem)
             }
         }
 
@@ -89,7 +111,7 @@ class EditBannerDialogFragment : DialogFragment(){
             this.imageUrl = imageUrl
             this.redirectUrl = redirectionUrl
         }
-        bannerController.addNewBanner(bannerItem, documentId)
+        editBannerViewModel.addBanner(bannerItem, documentId)
             .addOnSuccessListener {
                 dismiss()
             }
@@ -112,7 +134,7 @@ class EditBannerDialogFragment : DialogFragment(){
             this.redirectUrl = redirectionUrl
         }
 
-        bannerController.editBanner(bannerItem, documentId)
+        editBannerViewModel.editBanner(bannerItem, documentId)
             .addOnSuccessListener {
                 dismiss()
             }
@@ -128,10 +150,15 @@ class EditBannerDialogFragment : DialogFragment(){
         val height = resources.displayMetrics.heightPixels * 0.7
 
         dialog?.window?.setLayout(width.toInt(), height.toInt())
-    }
+        binding?.inputDescription?.setText("")
+        binding?.inputDialogTitle?.setText("")
+        binding?.inputImageUrl?.setText("")
+        binding?.inputRedirectUrl?.setText("")
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
         binding = null
     }
+
 }
