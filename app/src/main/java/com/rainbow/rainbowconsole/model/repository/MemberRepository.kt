@@ -9,7 +9,7 @@ import kotlinx.coroutines.Deferred
 
 interface MemberRepository {
 
-    fun findByUid(uid : String) : Deferred<Pair<UserDTO?, String>>
+    fun findByUid(uid : String) : Query
 
     fun findByName(name : String) : Deferred<UserDTO?>
 
@@ -17,7 +17,7 @@ interface MemberRepository {
 
     fun findByProName(name : String) : Deferred<ArrayList<UserDTO>>
 
-    fun findByProUid(uid : String) : Deferred<ArrayList<UserDTO>>
+    fun findByProUid(uid : String) : Query
 
     fun findAll() : CollectionReference
 

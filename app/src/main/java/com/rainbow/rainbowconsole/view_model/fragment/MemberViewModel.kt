@@ -6,13 +6,13 @@ import com.rainbow.rainbowconsole.config.AppConfig
 import com.rainbow.rainbowconsole.model.data_class.UserDTO
 
 class MemberViewModel : ViewModel(){
-    private val memberController =  AppConfig.memberController
+    private val memberRepository =  AppConfig.memberRepository
     private val memberItemData : MutableLiveData<ArrayList<UserDTO>> by lazy {
             MutableLiveData()
         }
     fun getUserItems(branch : String){
         if(branch == "전체"){
-            memberController.searchAll()
+            memberRepository.findAll()
                 .addSnapshotListener { querySnapshot, error ->
                     if(error != null || querySnapshot == null) return@addSnapshotListener
 
@@ -21,7 +21,7 @@ class MemberViewModel : ViewModel(){
 
         }
         else{
-            memberController.searchByBranch(branch)
+            memberRepository.finByBranch(branch)
                 .addSnapshotListener { querySnapshot, error ->
                     if(error != null || querySnapshot == null) return@addSnapshotListener
                     memberItemData.value = querySnapshot.toObjects(UserDTO::class.java) as ArrayList

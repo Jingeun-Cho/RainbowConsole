@@ -11,7 +11,9 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.rainbow.rainbowconsole.R
@@ -22,19 +24,27 @@ import com.rainbow.rainbowconsole.model.controller.ProController
 import com.rainbow.rainbowconsole.databinding.FragmentEdieProBinding
 import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
 import com.rainbow.rainbowconsole.model.data_class.ManagerScheduleDTO
+import com.rainbow.rainbowconsole.view_model.fragment.EditProViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class EditProDialogFragment : DialogFragment(){
 
     private var binding : FragmentEdieProBinding? = null
-    private val proController : ProController = AppConfig.proController
+    private lateinit var editProViewModel : EditProViewModel
+//    private val proController : ProController = AppConfig.proController
     private var previousPosition = 0
     private var isNotFirst = false
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-        binding = FragmentEdieProBinding.inflate(inflater, container, false)
+        editProViewModel = ViewModelProvider(this).get(EditProViewModel::class.java)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edie_pro, container, false)
+        binding?.apply {
+            lifecycleOwner = viewLifecycleOwner
+            editProViewModel
+        }
         return binding?.root
     }
 
@@ -46,7 +56,7 @@ class EditProDialogFragment : DialogFragment(){
 
     }
     private fun updateProfile(proItem : ManagerDTO, proSchedule: ManagerScheduleDTO){
-        proController.updatePro(proItem, proSchedule)!!
+        editProViewModel.updatePro(proItem, proSchedule)!!
             .addOnSuccessListener { dismiss() }
             .addOnFailureListener {
                 Snackbar.make(binding!!.root, "수정에 실패 했습니다, 잠시 후 다 시도해주세요.", Snackbar.LENGTH_SHORT ).show()
@@ -55,132 +65,141 @@ class EditProDialogFragment : DialogFragment(){
 
     private fun initView(proUid : String){
         CoroutineScope(Dispatchers.Main).launch {
-            val proItem = proController.searchProByUid(proUid).await()
-            val proSchedule = proController.getProSchedule(proUid).await()
             val editBranchItems = resources.getStringArray(R.array.edit_branch)
             val dateOfWeek = resources.getStringArray(R.array.date_of_week)
             val branchSpinnerAdapter = ArrayAdapter(requireContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, editBranchItems)
             val dateSelectAdapter = ArrayAdapter(requireContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, dateOfWeek)
-            if(proItem != null){
+            editProViewModel.getProItem(proUid)
 
-                Glide
-                    .with(this@EditProDialogFragment)
-                    .load(proItem.profileImg)
-                    .placeholder(R.drawable.default_profile)
-                    .circleCrop()
-                    .into(binding!!.imgPro)
+            editProViewModel.observeProItem().observe(viewLifecycleOwner){
+                val proItem = it.first
+                val proSchedule = it.second
 
-                binding?.inputProName?.setText(proItem.name)
-                binding?.inputProPhone?.setText(proItem.phone)
+                if(proItem != null && proSchedule != null){
 
-                Log.d("spinner", "onViewCreated: ${proItem.branch} / ${editBranchItems.indexOf(proItem.branch + "점") }")
-                binding?.inputProWebpage?.setText(proItem.proUrl)
-                binding?.inputProBranch?.apply {
-                    adapter = branchSpinnerAdapter
-                    setSelection(editBranchItems.indexOf(proItem.branch + "점"))
-                    onItemSelectedListener = object : OnItemSelectedListener {
-                        override fun onItemSelected( parent: AdapterView<*>?, view: View?, position: Int, id: Long ) {
-                            proItem.branch = editBranchItems[position].substring(0, editBranchItems[position].length - 1)
+                    Glide
+                        .with(this@EditProDialogFragment)
+                        .load(proItem.profileImg)
+                        .placeholder(R.drawable.default_profile)
+                        .circleCrop()
+                        .into(binding!!.imgPro)
+
+                    binding?.inputProName?.setText(proItem.name)
+                    binding?.inputProPhone?.setText(proItem.phone)
+
+                    Log.d("spinner", "onViewCreated: ${proItem.branch} / ${editBranchItems.indexOf(proItem.branch + "점") }")
+                    binding?.inputProWebpage?.setText(proItem.proUrl)
+                    binding?.inputProBranch?.apply {
+                        adapter = branchSpinnerAdapter
+                        setSelection(editBranchItems.indexOf(proItem.branch + "점"))
+                        onItemSelectedListener = object : OnItemSelectedListener {
+                            override fun onItemSelected( parent: AdapterView<*>?, view: View?, position: Int, id: Long ) {
+                                proItem.branch = editBranchItems[position].substring(0, editBranchItems[position].length - 1)
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>?) {
+                                Log.d("spinner", "onViewCreated1: ${editBranchItems} ")
+                            }
+                        }
+                    }
+
+                    binding?.inputProStartTime?.addTextChangedListener(object : TextWatcher{
+                        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {
                         }
 
-                        override fun onNothingSelected(parent: AdapterView<*>?) {
-                            Log.d("spinner", "onViewCreated1: ${editBranchItems} ")
+                        override fun onTextChanged( string: CharSequence?, start: Int, before: Int, count: Int ) {
+                            inputTextFormatTime(binding?.inputProStartTime!!, string!!, before,count)
+
                         }
+
+                        override fun afterTextChanged(s: Editable?) {
+                        }
+                    })
+
+                    binding?.inputProEndTime?.addTextChangedListener(object : TextWatcher{
+                        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {
+                        }
+
+                        override fun onTextChanged( string: CharSequence?, start: Int, before: Int, count: Int ) {
+                            inputTextFormatTime(binding?.inputProEndTime!!, string!!, before,count)
+
+                        }
+
+                        override fun afterTextChanged(s: Editable?) {
+                        }
+                    })
+
+                    binding?.inputProRestStartTime?.addTextChangedListener(object : TextWatcher{
+                        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {
+                        }
+
+                        override fun onTextChanged( string: CharSequence?, start: Int, before: Int, count: Int ) {
+                            inputTextFormatTime(binding?.inputProRestStartTime!!, string!!, before,count)
+
+                        }
+
+                        override fun afterTextChanged(s: Editable?) {
+                        }
+                    })
+
+                    binding?.inputProRestEndTime?.addTextChangedListener(object : TextWatcher{
+                        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {
+                        }
+
+                        override fun onTextChanged( string: CharSequence?, start: Int, before: Int, count: Int ) {
+                            inputTextFormatTime(binding?.inputProRestEndTime!!, string!!, before,count)
+
+                        }
+
+                        override fun afterTextChanged(s: Editable?) {
+                        }
+                    })
+
+
+
+
+                    binding?.inputProScheduleDate?.apply {
+                        adapter = dateSelectAdapter
+                        onItemSelectedListener = object : OnItemSelectedListener{
+                            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long ) {
+                                updateEditScheduleView(proSchedule, position )
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>?) {
+                            }
+                        }
+                    }
+                    binding?.btnUpdate?.setOnClickListener {
+                        val beforeWorkStart = binding?.inputProStartTime?.text.toString().convertTimestamp()
+                        val beforeWorkEnd = binding?.inputProEndTime?.text.toString().convertTimestamp()
+                        val beforeRestStart = binding?.inputProRestStartTime?.text.toString().convertTimestamp()
+                        val beforeRestEnd = binding?.inputProRestEndTime?.text.toString().convertTimestamp()
+                        proSchedule.schedule[previousPosition].apply {
+                            workingStart = beforeWorkStart
+                            workingFinish = beforeWorkEnd
+                            restStart = beforeRestStart
+                            restFinish = beforeRestEnd
+                        }
+                        //ProItem update
+                        proItem.name = binding?.inputProName?.text.toString()
+                        proItem.phone = binding?.inputProPhone?.text.toString()
+                        proItem.proUrl = binding?.inputProWebpage?.text.toString()
+                        updateProfile(proItem, proSchedule)
+                    }
+
+                    binding?.btnCancel?.setOnClickListener {
+                        dismiss()
                     }
                 }
-
-                binding?.inputProStartTime?.addTextChangedListener(object : TextWatcher{
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {
-                    }
-
-                    override fun onTextChanged( string: CharSequence?, start: Int, before: Int, count: Int ) {
-                        inputTextFormatTime(binding?.inputProStartTime!!, string!!, before,count)
-
-                    }
-
-                    override fun afterTextChanged(s: Editable?) {
-                    }
-                })
-
-                binding?.inputProEndTime?.addTextChangedListener(object : TextWatcher{
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {
-                    }
-
-                    override fun onTextChanged( string: CharSequence?, start: Int, before: Int, count: Int ) {
-                        inputTextFormatTime(binding?.inputProEndTime!!, string!!, before,count)
-
-                    }
-
-                    override fun afterTextChanged(s: Editable?) {
-                    }
-                })
-
-                binding?.inputProRestStartTime?.addTextChangedListener(object : TextWatcher{
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {
-                    }
-
-                    override fun onTextChanged( string: CharSequence?, start: Int, before: Int, count: Int ) {
-                        inputTextFormatTime(binding?.inputProRestStartTime!!, string!!, before,count)
-
-                    }
-
-                    override fun afterTextChanged(s: Editable?) {
-                    }
-                })
-
-                binding?.inputProRestEndTime?.addTextChangedListener(object : TextWatcher{
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {
-                    }
-
-                    override fun onTextChanged( string: CharSequence?, start: Int, before: Int, count: Int ) {
-                        inputTextFormatTime(binding?.inputProRestEndTime!!, string!!, before,count)
-
-                    }
-
-                    override fun afterTextChanged(s: Editable?) {
-                    }
-                })
-
-
-
-
-                binding?.inputProScheduleDate?.apply {
-                    adapter = dateSelectAdapter
-                    onItemSelectedListener = object : OnItemSelectedListener{
-                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long ) {
-                            updateEditScheduleView(proSchedule, position )
-                        }
-
-                        override fun onNothingSelected(parent: AdapterView<*>?) {
-                        }
-                    }
-                }
-                binding?.btnUpdate?.setOnClickListener {
-                    val beforeWorkStart = binding?.inputProStartTime?.text.toString().convertTimestamp()
-                    val beforeWorkEnd = binding?.inputProEndTime?.text.toString().convertTimestamp()
-                    val beforeRestStart = binding?.inputProRestStartTime?.text.toString().convertTimestamp()
-                    val beforeRestEnd = binding?.inputProRestEndTime?.text.toString().convertTimestamp()
-                    proSchedule.schedule[previousPosition].apply {
-                        workingStart = beforeWorkStart
-                        workingFinish = beforeWorkEnd
-                        restStart = beforeRestStart
-                        restFinish = beforeRestEnd
-                    }
-                    //ProItem update
-                    proItem.name = binding?.inputProName?.text.toString()
-                    proItem.phone = binding?.inputProPhone?.text.toString()
-                    proItem.proUrl = binding?.inputProWebpage?.text.toString()
-                    updateProfile(proItem, proSchedule)
-                }
-
-                binding?.btnCancel?.setOnClickListener {
+                else{
+                    //Alert 추가
                     dismiss()
                 }
+
+
             }
-            else{
-                //Alert 추가
-                dismiss()
-            }
+
+
         }
     }
 

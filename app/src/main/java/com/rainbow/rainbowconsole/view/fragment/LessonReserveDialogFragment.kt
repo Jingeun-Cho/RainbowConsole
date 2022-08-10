@@ -8,45 +8,46 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
+import com.rainbow.rainbowconsole.R
 import com.rainbow.rainbowconsole.R.*
-import com.rainbow.rainbowconsole.config.AppConfig
 import com.rainbow.rainbowconsole.config.AppConfig.convertTimestampToDate
-import com.rainbow.rainbowconsole.model.controller.LessonController
-import com.rainbow.rainbowconsole.model.controller.MemberController
-import com.rainbow.rainbowconsole.model.controller.ProController
 import com.rainbow.rainbowconsole.databinding.DialogLessonReservationBinding
 import com.rainbow.rainbowconsole.model.data_class.LessonDTO
 import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
 import com.rainbow.rainbowconsole.model.data_class.UserDTO
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.rainbow.rainbowconsole.view_model.fragment.LessonViewModel
 
 class LessonReserveDialogFragment : DialogFragment(){
+
     private var binding : DialogLessonReservationBinding? = null
-    private val proController : ProController = AppConfig.proController
-    private val memberController : MemberController = AppConfig.memberController
-    private  val lessonController : LessonController = AppConfig.lessonController
+    private lateinit var lessonViewModel : LessonViewModel
     private var selectedMember : UserDTO? = null
     private var selectedLessonType : String = "레슨"
     private var lessonDuration : Long = 15 * 60 * 1000
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DialogLessonReservationBinding.inflate(inflater, container, false)
+        lessonViewModel = ViewModelProvider(this).get(LessonViewModel::class.java)
+        binding = DataBindingUtil.inflate(inflater, R.layout.dialog_lesson_reservation, container, false)
+
+        binding?.apply {
+            lifecycleOwner = viewLifecycleOwner
+            lessonReserveViewModel = lessonReserveViewModel
+        }
         return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val proUid = arguments?.getString("proUid", "")
+        val proUid = arguments?.getString("proUid", "")!!
         val selectedTime = arguments?.getLong("lessonDateTime", 0)!!
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val pro : ManagerDTO? = getProInformation(proUid)
-            val memberList = getMemberList(proUid)
-            requireActivity().runOnUiThread {
+        lessonViewModel.getReserveData(proUid)
+        lessonViewModel.observeReserveData().observe(viewLifecycleOwner){
+            val pro = it.first
+            val memberList = it.second
             initView(pro, memberList, selectedTime)
-            }
         }
     }
 
@@ -108,7 +109,9 @@ class LessonReserveDialogFragment : DialogFragment(){
                         type = selectedLessonType )
 
                     val documentId = "${pro?.name}_${selectedTime}"
-                    lessonController.reserveLesson(documentId, reserveLesson)
+
+
+                    lessonViewModel.reserveLesson(documentId, reserveLesson)
                         .addOnSuccessListener {
                             //완료 화면 추가
                             dismiss()
@@ -123,17 +126,6 @@ class LessonReserveDialogFragment : DialogFragment(){
             dismiss()
         }
     }
-
-    private suspend fun getProInformation(uid : String?) : ManagerDTO?{
-        if(uid.isNullOrBlank()) return null
-        return proController.searchProByUid(uid).await()
-    }
-    private suspend fun getMemberList(uid : String?) : ArrayList<UserDTO>{
-        if(uid.isNullOrBlank()) return arrayListOf()
-        return memberController.searchByProUid(uid).await()
-    }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

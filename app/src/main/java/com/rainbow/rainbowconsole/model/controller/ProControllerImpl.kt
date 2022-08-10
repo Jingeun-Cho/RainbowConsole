@@ -1,6 +1,7 @@
 package com.rainbow.rainbowconsole.model.controller
 
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Transaction
 import com.rainbow.rainbowconsole.model.repository.ProRepository
@@ -10,7 +11,7 @@ import kotlinx.coroutines.*
 
 class ProControllerImpl(private val proRepository : ProRepository) : ProController{
 
-    override fun searchProByUid(uid: String): Deferred<ManagerDTO?> = proRepository.findByUid(uid)
+    override fun searchProByUid(uid: String): DocumentReference = proRepository.findByUid(uid)
 
     override fun searchProByName(name: String): Deferred<ManagerDTO?> = proRepository.findByName(name)
 
@@ -18,7 +19,7 @@ class ProControllerImpl(private val proRepository : ProRepository) : ProControll
 
     override fun getAllPro(): Query? = proRepository.findAllByBranch()
 
-    override fun getProSchedule(uid : String): Deferred<ManagerScheduleDTO> = proRepository.findProScheduleByUid(uid)
+    override fun getProSchedule(uid : String): DocumentReference = proRepository.findProScheduleByUid(uid)
     override fun updatePro(pro: ManagerDTO, proSchedule : ManagerScheduleDTO): Task<Transaction>? = proRepository.updatePro(pro, proSchedule)
 
 

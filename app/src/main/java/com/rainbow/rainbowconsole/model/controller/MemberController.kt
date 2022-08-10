@@ -8,9 +8,9 @@ import com.rainbow.rainbowconsole.model.data_class.UserDTO
 import kotlinx.coroutines.Deferred
 
 interface MemberController {
-    fun searchByUid(uid : String) : Deferred<Pair<UserDTO? ,String>>
+    fun searchByUid(uid : String) : Query
     fun searchByName(name : String) : Deferred<UserDTO?>
-    fun searchByProUid(proUid : String) : Deferred<ArrayList<UserDTO>>
+    fun searchByProUid(proUid : String) : Query
     fun searchByBranch(branch : String) : Query
     fun searchAll() : CollectionReference
     fun updateUser(userItem : UserDTO, documentId : String) : Task<Transaction>

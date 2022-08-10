@@ -9,11 +9,11 @@ import com.rainbow.rainbowconsole.model.data_class.UserDTO
 import kotlinx.coroutines.Deferred
 
 class MemberControllerImpl(private val memberRepository: MemberRepository) : MemberController{
-    override fun searchByUid(uid: String): Deferred<Pair<UserDTO?, String>> = memberRepository.findByUid(uid)
+    override fun searchByUid(uid: String): Query = memberRepository.findByUid(uid)
 
     override fun searchByName(name: String): Deferred<UserDTO?> = memberRepository.findByName(name)
 
-    override fun searchByProUid(proUid: String) : Deferred<ArrayList<UserDTO>> = memberRepository.findByProUid(proUid)
+    override fun searchByProUid(proUid: String) : Query = memberRepository.findByProUid(proUid)
 
     override fun searchByBranch(branch: String): Query = memberRepository.finByBranch(branch)
 

@@ -15,6 +15,7 @@ import com.rainbow.rainbowconsole.model.controller.LessonController
 import com.rainbow.rainbowconsole.model.controller.ProController
 import com.rainbow.rainbowconsole.databinding.FragmentProBinding
 import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
+import com.rainbow.rainbowconsole.model.data_class.ManagerScheduleDTO
 import com.rainbow.rainbowconsole.view_model.fragment.ProViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,17 +55,13 @@ class ProFragment : Fragment(){
     }
 
     private fun initView(branch : String){
-        proViewModel.observeProItems().observe(viewLifecycleOwner){ proItems ->
-            initProRecyclerView(proItems)
-        }
-    }
-
-    private fun initProRecyclerView(proItems : ArrayList<ManagerDTO>){
         binding!!.recyclerProList.apply {
             layoutManager = GridLayoutManager(requireContext(), 3)
-            adapter = ProRecyclerViewAdapter(proItems)
+            adapter = ProRecyclerViewAdapter()
+        }
+        proViewModel.observeProItems().observe(viewLifecycleOwner){ proItems ->
+            (binding!!.recyclerProList.adapter as ProRecyclerViewAdapter).getData(proItems)
         }
     }
-
 
 }

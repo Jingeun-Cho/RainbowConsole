@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 class EditBannerDialogFragment : DialogFragment(){
     private var binding : FragmentEditBannerDialogBinding? = null
     private lateinit var editBannerViewModel: EditBannerViewModel
+
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
         editBannerViewModel = ViewModelProvider(this).get(EditBannerViewModel::class.java)
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_banner_dialog, container, false)

@@ -1,5 +1,6 @@
 package com.rainbow.rainbowconsole.view.adapter
 
+import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
@@ -10,6 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.*
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.rainbow.rainbowconsole.R
 import com.rainbow.rainbowconsole.config.AppConfig
@@ -18,18 +20,15 @@ import com.rainbow.rainbowconsole.model.controller.MemberController
 import com.rainbow.rainbowconsole.databinding.LayoutTimeTableRowBinding
 import com.rainbow.rainbowconsole.model.data_class.LessonDTO
 import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
+import com.rainbow.rainbowconsole.model.data_class.UserDTO
+import com.rainbow.rainbowconsole.view_model.fragment.DashboardViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class TodayScheduleRecyclerViewAdapter(
-    private val pro: ArrayList<ManagerDTO>,
-    private val todayLessonItems: ArrayList<LessonDTO>,
-    private val documentIds: ArrayList<String>,
-    private val today: Long
+class TodayScheduleRecyclerViewAdapter( private val pro: ArrayList<ManagerDTO>, private val today: Long
 ) : RecyclerView.Adapter<TodayScheduleRecyclerViewAdapter.ViewHolder>() {
-    private val tableLength = pro.size
 
     //Constructor
     /**
@@ -40,7 +39,15 @@ class TodayScheduleRecyclerViewAdapter(
     private val ticHour  = 18
     private val startTimeMilli = startTime * 60 * 60 * 1000
     private val intervalMilli : Long = interval * 60 * 1000
-    private val memberController : MemberController = AppConfig.memberController
+    private val todayLessonItems: ArrayList<Triple<LessonDTO, String, UserDTO>> = arrayListOf()
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun getData(lessonItem : ArrayList<Triple<LessonDTO, String, UserDTO>>){
+        todayLessonItems.clear()
+        todayLessonItems.addAll(lessonItem)
+        notifyDataSetChanged()
+    }
+
 
 
     inner class ViewHolder(val binding : LayoutTimeTableRowBinding) : RecyclerView.ViewHolder(binding.root)
@@ -83,9 +90,9 @@ class TodayScheduleRecyclerViewAdapter(
 
     private fun updateTableRow(binding: LayoutTimeTableRowBinding,  viewIndex : Int, time : Long,){
         val textView = binding.layoutRoot[viewIndex] as TextView
-        val (lesson, index) = getMatchLesson(todayLessonItems,time, pro[viewIndex].uid!!)
+        val index = getMatchLesson(todayLessonItems, time, pro[viewIndex].uid!!)
 
-        if(lesson == null){
+        if(index  == -1){
             textView.background.setTint(ContextCompat.getColor(binding.root.context ,R.color.disable_gray))
             textView.text = time.createTimeTableRowTime()
             textView.setOnClickListener {
@@ -94,38 +101,35 @@ class TodayScheduleRecyclerViewAdapter(
             textView.setOnLongClickListener { return@setOnLongClickListener true }
             return
         }
+        else{
+            val lesson = todayLessonItems[index].first
+            val documentId = todayLessonItems[index].second
+            val user = todayLessonItems[index].third
 
-        CoroutineScope(Dispatchers.Main).launch {
-            val (member, documentId) = memberController.searchByUid(lesson.uid!!).await()
-            textView.text = member?.name
+            textView.text = user.name
             if(lesson.lessonNote!!.isNotEmpty()) textView.background.setTint( ContextCompat.getColor(binding.root.context, R.color.lesson_green) )
 
             else {
                 textView.background.setTint(ContextCompat.getColor(binding.root.context, R.color.available_purple) )
                 textView.setOnClickListener {  }
                 textView.setOnLongClickListener {
-                    showLessonCancelDialog(binding, documentIds[index])
+                    showLessonCancelDialog(binding, documentId)
                     return@setOnLongClickListener false
                 }
             }
+
         }
     }
 
     override fun getItemCount(): Int = ticHour * 4 + 1
 
-    private fun getMatchLesson(lessonItems : ArrayList<LessonDTO>, time : Long, proUid : String) : Pair<LessonDTO?, Int> {
+    private fun getMatchLesson(lessonItems : ArrayList<Triple<LessonDTO, String, UserDTO>>, time : Long, proUid : String) : Int {
 
-        var lesson : LessonDTO? = null
-        var selectedIndex : Int = -1
-        lessonItems.forEachIndexed { index, item ->
-            if( today + time in  item.lessonDateTime!! until  (item.lessonDateTime!! + item.lessontime!!) && proUid == item.coachUid){
-                lesson = item
-                selectedIndex = index
-                return@forEachIndexed
-            }
+        val selectedIndex : Int = lessonItems.indexOfFirst { (item, _, _) ->
+            today + time in  item.lessonDateTime!! until  (item.lessonDateTime!! + item.lessontime!!) && proUid == item.coachUid
         }
 
-        return Pair(lesson, selectedIndex)
+        return selectedIndex
     }
 
     private fun showLessonReserveDialog(binding: LayoutTimeTableRowBinding, proUid : String, selectedTime : Long){

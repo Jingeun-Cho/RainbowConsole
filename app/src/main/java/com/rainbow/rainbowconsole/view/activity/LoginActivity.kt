@@ -77,30 +77,24 @@ class LoginActivity : AppCompatActivity() {
     private fun login(branch : String, email : String, password : String){
         loginViewModel.loginByEmailPassword(email, password)
         loginViewModel.getLoginInformation().observe(this){ loginResult ->
-            if(loginResult != null){
-                loginViewModel.getManagerByEmail(email)
-                loginViewModel.observeManagerInformation().observe(this@LoginActivity){
-                    if( it != null && (branch == it.branch || branch == "전체")  ){
-                        loginViewModel.observeManagerInformation().removeObservers(this@LoginActivity)
-                        startActivity(loginResult, branch)
-                    }
-                    else{
-                        runOnUiThread {
-                            Snackbar.make(binding.root, "해당 지점에 존재하지 않는 프로입니다", Snackbar.LENGTH_SHORT).show()
-                        }
-                        AppConfig.auth.signOut()
-                    }
+            val firebaseUser = loginResult.first
+            val manager = loginResult.second
+            if(firebaseUser != null){
+                if( manager != null && (branch == manager.branch || branch == "전체")  ){
+                    loginViewModel.observeManagerInformation().removeObservers(this@LoginActivity)
+                    startActivity(firebaseUser, branch)
                 }
-
+                else{
+                    runOnUiThread {
+                        Snackbar.make(binding.root, "해당 지점에 존재하지 않는 프로입니다", Snackbar.LENGTH_SHORT).show()
+                    }
+                    AppConfig.auth.signOut()
+                }
             }
             else{
-                runOnUiThread {
-                    Snackbar.make(binding.root, "아이디 또는 비밀번호가 맞지 않습니다. 다시 시도해주세요", Snackbar.LENGTH_SHORT).show()
-                }
+                Snackbar.make(binding.root, "아이디 또는 비밀번호가 맞지 않습니다. 다시 시도해주세요", Snackbar.LENGTH_SHORT).show()
             }
         }
-
-
     }
 
     private fun startActivity(user : FirebaseUser?, branch: String){

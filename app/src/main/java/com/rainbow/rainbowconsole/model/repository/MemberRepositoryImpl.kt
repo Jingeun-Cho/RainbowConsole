@@ -14,26 +14,11 @@ import kotlinx.coroutines.tasks.await
 
 class MemberRepositoryImpl(private val firestore : FirebaseFirestore) : MemberRepository{
 
-    override fun findByUid(uid: String): Deferred<Pair<UserDTO?, String>> =
-        CoroutineScope(Dispatchers.IO).async {
-            try {
-                val result = firestore
-                    .collection("user")
-                    .whereEqualTo("uid", uid)
-                    .get()
-                    .await()
-                    .documents[0]
-                Pair(result.toObject(UserDTO::class.java), result.id)
-            }
-            catch (e : FirebaseException){
-                Log.e("FirebaseMemberRepository", "findByUid: ${e.message}")
-                Pair(null, "")
-            }
-            catch (e : IndexOutOfBoundsException){
-                Log.e("FirebaseMemberRepository", "findByUid: ${e.message}")
-                Pair(null, "")
-            }
-        }
+    override fun findByUid(uid: String): Query =
+           firestore
+                .collection("user")
+                .whereEqualTo("uid", uid)
+
 
 
 
@@ -78,26 +63,18 @@ class MemberRepositoryImpl(private val firestore : FirebaseFirestore) : MemberRe
 
 
 
-    override fun findByProUid(uid: String): Deferred<ArrayList<UserDTO>> =
-        CoroutineScope(Dispatchers.IO).async {
-            try{
+    override fun findByProUid(uid: String):  Query =
                 firestore
                     .collection("user")
                     .whereEqualTo("proUid", uid)
-                    .get()
-                    .await()
-                    .toObjects<UserDTO>() as ArrayList
 
-            }
-            catch (e : FirebaseException){
-                Log.e("FirebaseMemberRepository", "findByUid: ${e.message}")
-                arrayListOf()
-            }
-        }
 
-    override fun findAll(): CollectionReference = firestore.collection("user")
 
-    override fun finByBranch(branch: String): Query = firestore.collection("user").whereEqualTo("branch", branch)
+    override fun findAll(): CollectionReference =
+        firestore.collection("user")
+
+    override fun finByBranch(branch: String): Query =
+        firestore.collection("user").whereEqualTo("branch", branch)
 
 
 

@@ -3,7 +3,6 @@ package com.rainbow.rainbowconsole.view.fragment
 import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -13,32 +12,23 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.firestore.Query
 import com.rainbow.rainbowconsole.R
 import com.rainbow.rainbowconsole.view.adapter.TodayScheduleRecyclerViewAdapter
-import com.rainbow.rainbowconsole.config.AppConfig
-import com.rainbow.rainbowconsole.model.controller.LessonController
-import com.rainbow.rainbowconsole.model.controller.ProController
 import com.rainbow.rainbowconsole.databinding.FragmentDashboardBinding
 import com.rainbow.rainbowconsole.model.data_class.LessonDTO
 import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
+import com.rainbow.rainbowconsole.model.data_class.UserDTO
 import com.rainbow.rainbowconsole.view_model.fragment.DashboardViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneOffset
 
 class DashboardFragment : Fragment(){
     private var binding : FragmentDashboardBinding? = null
     private lateinit var dashboardViewModel : DashboardViewModel
-    private val proController : ProController = AppConfig.proController
 
     companion object{
-        const val TAG = "DashboardFragment"
         const val TIME_OFFSET = 24 * 60 * 60 * 1000 - 1
     }
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
@@ -77,15 +67,19 @@ class DashboardFragment : Fragment(){
     @SuppressLint("SetTextI18n")
     private fun initView(proItems : ArrayList<ManagerDTO>, startTime : Long){
         binding!!.recyclerTd.layoutManager = LinearLayoutManager(requireContext(),  LinearLayoutManager.VERTICAL,  false )
+        binding!!.recyclerTd.adapter = TodayScheduleRecyclerViewAdapter(proItems, startTime)
 
-        dashboardViewModel.observeLessonItem().observe(requireActivity()){(todayLessonItems, documentIds) ->
-            var completeLesson = 0
+        dashboardViewModel.observeLessonItem().observe(viewLifecycleOwner){ todayLessonItems ->
+
             val totalLesson = todayLessonItems.size
-            todayLessonItems.forEach { if(it.lessonNote.isNullOrEmpty()) completeLesson++ }
+            val completeLesson = todayLessonItems.fold(0){ sum: Int, item: Triple<LessonDTO, String, UserDTO> ->
+                if(item.first.lessonNote.isNullOrEmpty()) sum + 1
+                else sum
+            }
 
             binding!!.textTotalLesson.text = "레슨 예정 : ${totalLesson}회"
             binding!!.textCompleteLesson.text = "레슨 완료 : ${completeLesson}회"
-            binding!!.recyclerTd.adapter = TodayScheduleRecyclerViewAdapter( proItems, todayLessonItems, documentIds ,startTime )
+            (binding!!.recyclerTd.adapter as TodayScheduleRecyclerViewAdapter).getData(todayLessonItems)
         }
     }
 
@@ -110,10 +104,9 @@ class DashboardFragment : Fragment(){
         super.onDestroyView()
         binding = null
     }
-    private fun getToday() : Long{
+    private fun getToday(): Long {
         val offset = ZoneOffset.systemDefault()
-        val today = LocalDate.now().atStartOfDay().atZone(offset).toInstant().toEpochMilli()
 
-        return today
+        return LocalDate.now().atStartOfDay().atZone(offset).toInstant().toEpochMilli()
     }
 }

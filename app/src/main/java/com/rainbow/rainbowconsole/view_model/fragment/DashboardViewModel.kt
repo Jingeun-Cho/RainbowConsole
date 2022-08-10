@@ -7,19 +7,19 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.rainbow.rainbowconsole.config.AppConfig
 import com.rainbow.rainbowconsole.model.data_class.LessonDTO
 import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
+import com.rainbow.rainbowconsole.model.data_class.UserDTO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class DashboardViewModel : ViewModel(){
     private val lessonRepository = AppConfig.lessonRepository
     private val proRepository = AppConfig.proRepository
-
-    private val lessonItem : MutableLiveData<Pair<ArrayList<LessonDTO>, ArrayList<String>>> = MutableLiveData(
-        Pair(arrayListOf(), arrayListOf()))
+    private val memberRepository = AppConfig.memberRepository
+    private val lessonItem : MutableLiveData<ArrayList<Triple<LessonDTO, String,UserDTO >>> = MutableLiveData()
 
     private val proItems : MutableLiveData<ArrayList<ManagerDTO>> = MutableLiveData()
-
 
     fun getProItems(branch : String){
         if (branch == "전체"){
@@ -46,22 +46,24 @@ class DashboardViewModel : ViewModel(){
         lessonRepository.findByUidWithPeriod(start, end, proItems)
             .addSnapshotListener { querySnapshot, error ->
                 if(querySnapshot == null || error != null) return@addSnapshotListener
-                val todayLessonItems : ArrayList<LessonDTO> = arrayListOf()
-                val documentIds : ArrayList<String> = arrayListOf()
+                val items : ArrayList<Triple<LessonDTO, String,UserDTO>> = arrayListOf()
 
-                querySnapshot.forEach {
-                    val item = it.toObject(LessonDTO::class.java)
-                    todayLessonItems.add(item)
-                    documentIds.add(it.id)
+                CoroutineScope(Dispatchers.IO).launch {
+                    querySnapshot.forEach {
+                        val item = it.toObject(LessonDTO::class.java)
+                        val user = memberRepository.findByUid(item.uid!!).get().await().toObjects(UserDTO::class.java)[0]
+                        items.add(Triple(item, it.id, user))
+                    }
+
+                    lessonItem.postValue(items)
                 }
 
-                lessonItem.postValue(Pair(todayLessonItems, documentIds))
             }
     }
 
     fun observeProItems() : MutableLiveData<ArrayList<ManagerDTO>> = proItems
 
-    fun observeLessonItem() : MutableLiveData<Pair<ArrayList<LessonDTO>, ArrayList<String>>> = lessonItem
+    fun observeLessonItem() :MutableLiveData<ArrayList<Triple<LessonDTO, String,UserDTO >>> = lessonItem
 
 
 

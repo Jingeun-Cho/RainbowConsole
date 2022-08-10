@@ -1,12 +1,15 @@
 package com.rainbow.rainbowconsole.view.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -17,6 +20,8 @@ import com.rainbow.rainbowconsole.config.AppConfig.auth
 import com.rainbow.rainbowconsole.databinding.ActivityMainBinding
 import com.rainbow.rainbowconsole.view_model.activity.MainViewModel
 import com.rainbow.rainbowconsole.model.data_class.LessonDTO
+import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
+import com.rainbow.rainbowconsole.model.data_class.UserDTO
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -46,7 +51,6 @@ class MainActivity : AppCompatActivity() {
         bundle.putString("branch", branch)
         setViewModel(branch)
         initView(branch)
-
     }
 
     private fun initView(branch : String){
@@ -56,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.textBranch.text = if( branch == "전체" ) branch else branch + "점"
         binding.recyclerRecentMember.layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
-
+        binding.recyclerRecentMember.adapter = RecentLessonRecyclerViewAdapter()
         setBranchStatusSpinner(branch, arrayItem)
         setSideButton()
     }
@@ -66,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.getBranchStatus(branch)
 
         mainViewModel.observeLessonData().observe(this@MainActivity){
+            Log.d("test", "setViewModel: call")
             initRecentRecyclerView(it)
         }
     }
@@ -125,9 +130,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initRecentRecyclerView(lessonItems : ArrayList<LessonDTO>){
-        binding.recyclerRecentMember.adapter = RecentLessonRecyclerViewAdapter(lessonItems)
-
+    private fun initRecentRecyclerView(lessonItems : ArrayList<Triple<LessonDTO, UserDTO, ManagerDTO>>){
+        (binding.recyclerRecentMember.adapter as RecentLessonRecyclerViewAdapter).getData(lessonItems)
     }
 
     private fun setBranchStatusSpinner(branch: String, branchArray : Array<String>){

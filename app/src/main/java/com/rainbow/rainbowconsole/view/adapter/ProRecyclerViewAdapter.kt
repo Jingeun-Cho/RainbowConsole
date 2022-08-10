@@ -1,7 +1,7 @@
 package com.rainbow.rainbowconsole.view.adapter
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -10,21 +10,24 @@ import com.bumptech.glide.Glide
 import com.rainbow.rainbowconsole.R
 import com.rainbow.rainbowconsole.config.AppConfig
 import com.rainbow.rainbowconsole.config.AppConfig.createTimeTableRowTime
-import com.rainbow.rainbowconsole.config.AppConfig.proController
 import com.rainbow.rainbowconsole.databinding.LayoutProProfileBinding
 import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.rainbow.rainbowconsole.model.data_class.ManagerScheduleDTO
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ProRecyclerViewAdapter(private val proItems : ArrayList<ManagerDTO>) : RecyclerView.Adapter<ProRecyclerViewAdapter.ViewHolder>() {
+class ProRecyclerViewAdapter() : RecyclerView.Adapter<ProRecyclerViewAdapter.ViewHolder>() {
+
     private val fragmentEditProDialog = AppConfig.editProDialogFragment
     private val calendar = Calendar.getInstance()
     private val dateOfWeek = if(calendar.get(Calendar.DAY_OF_WEEK) == 0) 6 else calendar.get(Calendar.DAY_OF_WEEK) - 2
-    init {
-        Log.d("dateOfWeek", "dateOfWeek ${dateOfWeek} ")
+    private val proItems : ArrayList<Pair<ManagerDTO, ManagerScheduleDTO>> = arrayListOf()
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun getData(data : ArrayList<Pair<ManagerDTO, ManagerScheduleDTO>>){
+        proItems.clear()
+        proItems.addAll(data)
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -42,15 +45,16 @@ class ProRecyclerViewAdapter(private val proItems : ArrayList<ManagerDTO>) : Rec
 
     override fun getItemCount(): Int = proItems.size
 
-    private fun setView(binding: LayoutProProfileBinding, data : ManagerDTO){
-
+    private fun setView(binding: LayoutProProfileBinding, data : Pair<ManagerDTO, ManagerScheduleDTO>){
+        val pro = data.first
+        val schedule = data.second
 
         Glide.with(binding.root.context)
-            .load(data.profileImg)
+            .load(pro.profileImg)
             .placeholder(R.drawable.default_profile)
             .circleCrop()
             .into(binding.imgProfile)
-        binding.textProName.text = data.name
+        binding.textProName.text = pro.name
         binding.viewWorkStart.title.text = "근무 시작"
 
         //진짜 시간 적용 필요
@@ -59,22 +63,20 @@ class ProRecyclerViewAdapter(private val proItems : ArrayList<ManagerDTO>) : Rec
 
         binding.btnInfo.setOnClickListener {
             val bundle = Bundle()
-            bundle.putString("proUid", data.uid)
+            bundle.putString("proUid", pro.uid)
             fragmentEditProDialog.arguments = bundle
             fragmentEditProDialog.show((binding.root.context as AppCompatActivity).supportFragmentManager, "editProDialogFragment")
         }
 
-        CoroutineScope(Dispatchers.Main).launch {
-            val proSchedule = proController.getProSchedule(data.uid!!).await()
-            proSchedule.schedule[dateOfWeek].apply {
-                binding.viewWorkStart.time.text = workingStart.createTimeTableRowTime()
-                binding.viewWorkEnd.time.text = workingFinish.createTimeTableRowTime()
-                if(working == "work")
-                    binding.btnInfo.text = "근무 중"
-                else
-                    binding.btnInfo.text = "휴무"
-            }
+        schedule.schedule[dateOfWeek].apply {
+        binding.viewWorkStart.time.text = workingStart.createTimeTableRowTime()
+        binding.viewWorkEnd.time.text = workingFinish.createTimeTableRowTime()
+        if(working == "work")
+            binding.btnInfo.text = "근무 중"
+        else
+            binding.btnInfo.text = "휴무"
         }
+
 
         //진짜 시간 적용 필요
 //        binding.viewWorkEnd.time.text = schedule.workingFinish.convertTimeStampToSimpleTime()

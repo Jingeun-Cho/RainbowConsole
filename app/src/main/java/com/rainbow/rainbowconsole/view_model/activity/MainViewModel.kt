@@ -6,13 +6,22 @@ import androidx.lifecycle.ViewModel
 import com.rainbow.rainbowconsole.config.AppConfig
 import com.rainbow.rainbowconsole.model.data_class.BranchStatusDTO
 import com.rainbow.rainbowconsole.model.data_class.LessonDTO
+import com.rainbow.rainbowconsole.model.data_class.ManagerDTO
+import com.rainbow.rainbowconsole.model.data_class.UserDTO
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class MainViewModel : ViewModel(){
     private val lessonRepository = AppConfig.lessonRepository
     private val branchRepository = AppConfig.branchRepository
-    private val lessonData : MutableLiveData<ArrayList<LessonDTO>> by lazy {
-        MutableLiveData<ArrayList<LessonDTO>>(arrayListOf())
-    }
+    private val memberRepository = AppConfig.memberRepository
+    private val proRepository = AppConfig.proRepository
+    private val recentItem : MutableLiveData<Pair<UserDTO, ManagerDTO>> = MutableLiveData()
+
+    private val lessonData : MutableLiveData<ArrayList<Triple<LessonDTO,UserDTO, ManagerDTO>>> = MutableLiveData()
 
     private val branchStatusData : MutableLiveData<BranchStatusDTO> by lazy {
         MutableLiveData<BranchStatusDTO>()
@@ -20,7 +29,11 @@ class MainViewModel : ViewModel(){
 
     private var updateResultData : Boolean = false
 
-    fun observeLessonData() : MutableLiveData<ArrayList<LessonDTO>>{
+
+    fun getRecentItem() :MutableLiveData<Pair<UserDTO, ManagerDTO>> = recentItem
+
+
+    fun observeLessonData() : MutableLiveData<ArrayList<Triple<LessonDTO,UserDTO, ManagerDTO>>>{
         return lessonData
     }
     fun observeBranchStatusData() : MutableLiveData<BranchStatusDTO>{
@@ -28,11 +41,24 @@ class MainViewModel : ViewModel(){
     }
 
     fun getTodayLesson(today : Long){
-        lessonRepository.findByPeriod(today, today + 24 * 60 * 60 * 1000 -1)
-            .addSnapshotListener { querySnapshot, error ->
-                if(error != null || querySnapshot == null) return@addSnapshotListener
-                lessonData.value = querySnapshot.toObjects(LessonDTO::class.java) as ArrayList
-            }
+            lessonRepository
+                .findByPeriod(today, today + 24 * 60 * 60 * 1000 -1)
+                .addSnapshotListener { querySnapshot, error ->
+                    if(error != null || querySnapshot == null) return@addSnapshotListener
+                    val items : ArrayList<Triple<LessonDTO, UserDTO, ManagerDTO>> = arrayListOf()
+                    val lessonItems = querySnapshot.toObjects(LessonDTO::class.java)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        lessonItems.forEach { item ->
+                            val user = memberRepository.findByUid(item.uid!!).get().await().toObjects(UserDTO::class.java)[0]
+                            val pro = proRepository.findByUid(item.coachUid!!).get().await().toObject(ManagerDTO::class.java)!!
+
+                            items.add(Triple(item, user, pro))
+                        }
+                        lessonData.postValue(items)
+                    }
+
+                }
+
     }
 
     fun getBranchStatus(branch : String){

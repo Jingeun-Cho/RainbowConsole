@@ -6,17 +6,23 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
+import com.rainbow.rainbowconsole.R
 import com.rainbow.rainbowconsole.config.AppConfig
 import com.rainbow.rainbowconsole.model.controller.LessonController
 import com.rainbow.rainbowconsole.databinding.DialogAlertBinding
+import com.rainbow.rainbowconsole.view_model.fragment.LessonViewModel
 
 class LessonDeleteDialogFragment : DialogFragment(){
 
     private var binding : DialogAlertBinding? = null
-    private val lessonController : LessonController =  AppConfig.lessonController
+    private lateinit var lessonDeleteViewModel : LessonViewModel
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DialogAlertBinding.inflate(inflater, container, false)
+
+        lessonDeleteViewModel = ViewModelProvider(requireActivity()).get(LessonViewModel::class.java)
+        binding = DataBindingUtil.inflate(inflater, R.layout.dialog_alert, container, false)
         return binding?.root
     }
 
@@ -30,7 +36,7 @@ class LessonDeleteDialogFragment : DialogFragment(){
         binding?.btnConfirm?.setOnClickListener {
             val documentId = arguments?.getString("documentId")
             if(!documentId.isNullOrEmpty()){
-                lessonController.deleteLesson(documentId)
+                lessonDeleteViewModel.removeLesson(documentId)
                 .addOnSuccessListener {
                     Log.d("lessonDeleteDialogFragment", "onViewCreated: lesson Deleted ")
                 }
@@ -38,7 +44,6 @@ class LessonDeleteDialogFragment : DialogFragment(){
                     Log.e("lessonDeleteDialogFragment", "onViewCreated: ${it.message}", )
                     throw it
                 }
-
             }
             else{
                 Log.d("lessonDeleteDialogFragment", "onViewCreated: lesson documentId is empty ")
@@ -49,25 +54,18 @@ class LessonDeleteDialogFragment : DialogFragment(){
         binding?.btnCancel?.setOnClickListener {
             dismiss()
         }
-
-
     }
 
     override fun onResume() {
         super.onResume()
         val width = resources.displayMetrics.widthPixels / 3
         val height = resources.displayMetrics.heightPixels / 3
-
         dialog?.window?.setLayout(width, height)
-
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onDestroy() {
+        super.onDestroy()
         binding = null
     }
 }
