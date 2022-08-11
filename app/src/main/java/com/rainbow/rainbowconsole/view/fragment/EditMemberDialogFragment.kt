@@ -41,9 +41,8 @@ class EditMemberDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val uid = arguments?.getString("uid", "")!!
-        val documentId = arguments?.getString("documentId", "")!!
         editMemberViewModel.getMemberItem(uid)
-        editMemberViewModel.observeMemberItem().observe(viewLifecycleOwner){ userItem ->
+        editMemberViewModel.observeMemberItem().observe(viewLifecycleOwner){ (userItem, documentId) ->
             if(userItem != null){
                 //First Row
                 binding?.textMemberName?.text = userItem.name

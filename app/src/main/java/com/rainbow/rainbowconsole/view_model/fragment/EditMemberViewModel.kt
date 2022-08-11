@@ -9,16 +9,16 @@ import com.rainbow.rainbowconsole.model.data_class.UserDTO
 
 class EditMemberViewModel : ViewModel(){
 
-    private val memberItem : MutableLiveData<UserDTO> = MutableLiveData()
+    private val memberItem : MutableLiveData<Pair<UserDTO?, String>> = MutableLiveData()
     private val memberRepository = AppConfig.memberRepository
 
-    fun observeMemberItem() : MutableLiveData<UserDTO> = memberItem
+    fun observeMemberItem() : MutableLiveData<Pair<UserDTO?, String>> = memberItem
 
     fun getMemberItem(uid : String){
         memberRepository.findByUid(uid)
             .get()
             .addOnSuccessListener {
-                memberItem.postValue(it.documents[0].toObject(UserDTO::class.java))
+                memberItem.postValue( Pair(it.documents[0].toObject(UserDTO::class.java), it.documents[0].id) )
             }
     }
 
